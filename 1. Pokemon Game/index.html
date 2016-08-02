@@ -1,0 +1,204 @@
+<html>
+    <head>
+        <title>Pokemon Game</title>
+        <style>
+            body{
+                background: black;
+            }
+            #mycanvas {
+                border: 2px solid blue;
+                background-image: url('assets/water.png');
+                -webkit-background-size:cover;
+                background-size:cover ;
+                margin-left:100px;
+            }
+        </style>
+
+
+    </head>
+    <body>
+        <canvas id="mycanvas" width="600px" height="500px">
+        </canvas>
+
+        <script>
+            var canvas = document.getElementById('mycanvas');
+            var ctx = canvas.getContext('2d');
+
+            var sprites = {};
+
+            sprites.player = new Image();
+            sprites.player.src = 'assets/pika.png';
+
+            sprites.goal = new Image();
+            sprites.goal.src = 'assets/ball.png';
+
+            sprites.enemy = [];
+
+            sprites.enemy[0] = new Image();
+            sprites.enemy[0].src = 'assets/bulbasaur.png';
+            sprites.enemy[1] = new Image();
+            sprites.enemy[1].src = 'assets/gengar.png';
+            sprites.enemy[2] = new Image();
+            sprites.enemy[2].src = 'assets/drowsy.png';
+            sprites.enemy[3] = new Image();
+            sprites.enemy[3].src = 'assets/meow.png';
+
+
+
+
+
+            var enemy = [
+                {
+                    x: 100,
+                    y: 100,
+                    w:  60,
+                    h:  60,
+                    speedY:2,
+                },
+                {
+                    x: 250,
+                    y: 200,
+                    w:  60,
+                    h:  60,
+                    speedY:2,
+                },
+                {
+                    x: 400,
+                    y: 300,
+                    w:  60,
+                    h:  60,
+                    speedY:2,
+                },
+                {
+                    x: 460,
+                    y: 400,
+                    w:  60,
+                    h:  60,
+                    speedY:1,
+                }
+
+            ];
+
+            GAME_WIDTH = 600;
+            GAME_HEIGHT = 500;
+
+            var gameOver = false;
+
+            var player = {
+                x:10,
+                y:250,
+                w:50,
+                h:50,
+                speedX:4,
+                isMoving:false
+            };
+
+            var goal = {
+                x:GAME_WIDTH-50,
+                y:250,
+                w:50,
+                h:50,
+            };
+
+            canvas.addEventListener("mousedown",function(){
+                //console.log("Clicked the canvas!");
+                player.isMoving = true;
+            });
+
+            canvas.addEventListener("mouseup",function(){
+                //console.log("Clicked the canvas!");
+                player.isMoving = false;
+            });
+            canvas.addEventListener("touchstart",function(){
+                //console.log("Clicked the canvas!");
+                player.isMoving = true;
+            });
+
+            canvas.addEventListener("touchend",function(){
+                //console.log("Clicked the canvas!");
+                player.isMoving = false;
+            });
+
+            var isColliding = function(r1,r2){
+                var firstCond = Math.abs(r1.x - r2.x) <= Math.max(r1.w,r2.w);
+                var secondCond = Math.abs(r1.y - r2.y) <=Math.max(r1.h,r2.h);
+
+                if(firstCond&&secondCond)
+                            return true;
+                else
+                        return false;
+            }
+
+
+            var update = function(){
+
+                //Check for Collision.
+                enemy.forEach(function(element,index){
+                        if(isColliding(player,element)){
+                            alert("Game Over !");
+                            gameOver = true;
+                            window.location = "";
+                        }
+
+                });
+
+                //Check for collision betweeen player and goal.
+                    if(isColliding(player,goal)){
+                        alert("Woaaaa...You WON the Game !");
+                        gameOver = true;
+                    }
+
+
+
+
+                enemy.forEach(function(element,index) {
+
+                    element.y += element.speedY;
+                    if(element.y >= GAME_HEIGHT-50 || element.y <=0){
+                        element.speedY *= -1;
+                    }
+                });
+
+                if(player.isMoving==true){
+                    player.x += player.speedX;
+                }
+
+            }
+
+            var draw = function() {
+                //Clear the screen
+                ctx.clearRect(0,0,GAME_WIDTH,GAME_HEIGHT);
+                ctx.fillStyle = "rgb(0,200,0)";
+
+                //Draw Enemies
+                enemy.forEach(function(element,index){
+                    ctx.drawImage(sprites.enemy[index],element.x,element.y,element.w,element.h);
+                });
+
+                //Draw Player
+                ctx.fillStyle = "rgb(200,0,0)";
+                ctx.drawImage(sprites.player,player.x,player.y,player.w,player.h);
+
+                //ctx.fillRect(player.x,player.y,player.w,player.h);
+
+                //Draw Goal
+                ctx.fillStyle = "rgb(100,100,230)";
+                ctx.drawImage(sprites.goal,goal.x,goal.y,goal.w,goal.h);
+
+            }
+            var render = function(){
+
+                draw();
+                update();
+                if(gameOver==false) {
+                    window.requestAnimationFrame(render);
+                }
+
+            }
+
+            render();
+
+        </script>
+    </body>
+
+</html>
